@@ -1,0 +1,75 @@
+#include "../Kinput2.conf"
+
+       WIDGETSRCS = AdoptedShe.c AuxPanel.c CandPanel.c Canvas.c \
+            CanvasShel.c ConvCtrl.c ConvDisp.c ConvMgr.c \
+            ICLabel.c InputConv.c KIProto.c OffConv.c \
+            OverConv.c OnConv.c WcharDisp.c XimpProto.c IMProto.c
+
+       WIDGETOBJS = AdoptedShe.o AuxPanel.o CandPanel.o Canvas.o \
+            CanvasShel.o ConvCtrl.o ConvDisp.o ConvMgr.o \
+            ICLabel.o InputConv.o KIProto.o OffConv.o \
+            OverConv.o OnConv.o WcharDisp.o XimpProto.o IMProto.o
+
+         UTILSRCS = cachedatom.c cachedfont.c ctext.c dispatch.c \
+            fontset.c wstring.c xtwstr.c xwstr.c \
+            asyncerr.c fontbank.c parsekey.c ioecall.c
+
+         UTILOBJS = cachedatom.o cachedfont.o ctext.o dispatch.o \
+            fontset.o wstring.o xtwstr.o xwstr.o \
+            asyncerr.o fontbank.o parsekey.o ioecall.o
+
+#define PassCDebugFlags 'CDEBUGFLAGS=$(CDEBUGFLAGS)'
+#define IHaveSubdirs
+          SUBDIRS = imlib
+
+#ifdef UseWnn
+          WNNSRCS = CcWnn.c cconv.c wnnlib.c
+          WNNOBJS = CcWnn.o cconv.o wnnlib.o
+          WNNINCS = -I$(WNNINCDIR)
+#ifdef UseWnn6
+          WNN6DEF = -DWNN6
+#endif
+#ifdef WnnLibDir
+        WNNLIBDIR = WnnLibDir
+        WNNLIBDEF = -DLIBDIR=\"$(WNNLIBDIR)\"
+#endif
+          WNNDEFS = -DCCDEFPATH=\"$(CCDEF_DIR)/\" \
+                    $(WNN6DEF) $(WNNLIBDEF)
+#endif
+#ifdef UseCanna
+        CANNASRCS = Canna.c
+        CANNAOBJS = Canna.o
+        CANNAINCS = -I$(CANNASRC)
+#endif
+#ifdef UseSj3
+          SJ3SRCS = Sj3.c
+          SJ3OBJS = Sj3.o
+          SJ3INCS = -I$(SJ3SRC)/sj3lib -I$(SJ3SRC)
+          SJ3DEFS = -DSJ3DEFPATH=\"$(SJ3DEF_DIR)/\"
+          SUBDIRS = imlib Xsj3clib
+#endif
+#ifdef UseAtok
+         ATOKSRCS = Atok.c
+         ATOKOBJS = Atok.o
+         ATOKINCS = -I$(ATOKINCDIR)
+          SUBDIRS = imlib Xatoklib
+#endif
+
+             SRCS = $(WIDGETSRCS) $(UTILSRCS) \
+                    $(WNNSRCS) $(CANNASRCS) $(SJ3SRCS) $(ATOKSRCS)
+             OBJS = $(WIDGETOBJS) $(UTILOBJS) \
+                    $(WNNOBJS) $(CANNAOBJS) $(SJ3OBJS) $(ATOKOBJS)
+
+   LOCAL_INCLUDES = -I../include -Iimlib
+         INCLUDES = $(LOCAL_INCLUDES) $(WNNINCS) $(CANNAINCS) $(SJ3INCS) $(ATOKINCS)
+
+          DEFINES = $(WNNDEFS) $(SJ3DEFS) $(TRANSPORTDEFS)
+
+NormalLibraryObjectRule()
+NormalLibraryTarget(Ki2,$(OBJS))
+DependTarget()
+
+#ifdef IHaveSubdirs
+MakeSubdirs($(SUBDIRS))
+DependSubdirs($(SUBDIRS))
+#endif
